@@ -15,3 +15,8 @@ func AddArticle(c *gin.Context) {
 	code := service.AddArticle(&article)
 	response.Response(c, code, consts.GetErrMsg(code))
 }
+
+// 查询文章列表
+func GetArt(c *gin.Context)  {
+	var article model.Article
+}

@@ -5,7 +5,6 @@ Gorm: # 只针对 gorm  操作数据库有效
   Host: "127.0.0.1"
   DbName: "db_myublog"
   Port: 3306
-  #      Prefix: "tb_"
   User: "root"
   Password: "quanpeng123"
   Charset: "utf8"

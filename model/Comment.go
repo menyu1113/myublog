@@ -5,6 +5,8 @@ import (
 )
 
 type Comment struct {
+	ArticleID uint
+	UserID uint
 	gorm.Model
 	UserId    uint   `json:"user_id"`
 	ArticleId uint   `json:"article_id"`
