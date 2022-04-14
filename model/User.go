@@ -6,7 +6,7 @@ import (
 
 type User struct {
 	gorm.Model
-	Blog Blog
+	Blog Blog //用户:博客站点 1：1
 	Comments []Comment //用户:评论 1：N
 	Categorys []Category //用户:分类 1：N
 	Articles  []Article //用户:文章 1：N

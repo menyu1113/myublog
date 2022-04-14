@@ -6,7 +6,6 @@ import (
 	"myublog/model"
 	"myublog/utils/response"
 	"myublog/utils/utiljwt"
-	"strconv"
 	"strings"
 )
 
@@ -45,12 +44,12 @@ func JwtToken() gin.HandlerFunc {
 			return
 		}
 		//检查token是不是当前用户的
-		id, _ := strconv.Atoi(c.Param("id"))
-		if !check(id, claims.Username) {
-			response.Fail(c, consts.ERRORCODE, utiljwt.TokenNoCurrentUser.Error())
-			c.Abort()
-			return
-		}
+		//id, _ := strconv.Atoi(c.Param("id"))
+		//if !check(id, claims.Username) {
+		//	response.Fail(c, consts.ERRORCODE, utiljwt.TokenNoCurrentUser.Error())
+		//	c.Abort()
+		//	return
+		//}
 		c.Set("username", claims)
 		c.Next()
 	}

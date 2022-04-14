@@ -72,6 +72,7 @@ func DeleteUser(c *gin.Context) {
 	response.Response(c, code, consts.GetErrMsg(code))
 }
 
+//修改密码
 func ChangeUserPassword(c *gin.Context) {
 	var user model.User
 	id, _ := strconv.Atoi(c.Param("id"))

@@ -1,69 +1,83 @@
 package service
 
-//
-//import (
-//	"gorm.io/gorm"
-//	"myublog/model"
-//)
-//
-//
-//// CheckCategory 查询分类是否存在
-//func CheckCategory(name string) (code int) {
-//	var cate Category
-//	model.GormDb.Select("id").Where("name = ?", name).First(&cate)
-//	if cate.ID > 0 {
-//		return errmsg.ERROR_CATENAME_USED //2001
-//	}
-//	return errmsg.SUCCSE
-//}
-//
-//// CreateCate 新增分类
-//func CreateCate(data *Category) int {
-//	err := model.GormDb.Create(&data).Error
-//	if err != nil {
-//		return errmsg.ERROR // 500
-//	}
-//	return errmsg.SUCCSE
-//}
-//
-//// GetCateInfo 查询单个分类信息
-//func GetCateInfo(id int) (Category,int) {
-//	var cate Category
-//	model.GormDb.Where("id = ?",id).First(&cate)
-//	return cate,errmsg.SUCCSE
-//}
-//
-//// GetCate 查询分类列表
-//func GetCate(pageSize int, pageNum int) ([]Category, int64) {
-//	var cate []Category
-//	var total int64
-//	err = model.GormDb.Find(&cate).Limit(pageSize).Offset((pageNum - 1) * pageSize).Error
-//	model.GormDb.Model(&cate).Count(&total)
-//	if err != nil && err != gorm.ErrRecordNotFound {
-//		return nil, 0
-//	}
-//	return cate, total
-//}
-//
-//// EditCate 编辑分类信息
-//func EditCate(id int, data *Category) int {
-//	var cate Category
-//	var maps = make(map[string]interface{})
-//	maps["name"] = data.Name
-//
-//	err = model.GormDb.Model(&cate).Where("id = ? ", id).Updates(maps).Error
-//	if err != nil {
-//		return errmsg.ERROR
-//	}
-//	return errmsg.SUCCSE
-//}
-//
-//// DeleteCate 删除分类
-//func DeleteCate(id int) int {
-//	var cate Category
-//	err = model.GormDb.Where("id = ? ", id).Delete(&cate).Error
-//	if err != nil {
-//		return errmsg.ERROR
-//	}
-//	return errmsg.SUCCSE
-//}
+import (
+	"gorm.io/gorm"
+	"myublog/global/consts"
+	"myublog/middleware/ZapLog"
+	"myublog/model"
+)
+// CheckCategory 查询分类是否存在
+func CheckCategory(name string) (code int) {
+	if name==""{
+		return consts.FailUpdataCateCode //2001
+	}
+	var cate model.Category
+	model.GormDb.Select("id").Where("name = ?", name).First(&cate)
+	if cate.ID > 0 {
+		return consts.FailCatenameUsedCode //2001
+	}
+	return consts.SUCCSECODE
+}
+func CreateCate(id int,category *model.Category)(code int){
+	var user model.User
+	err:=model.GormDb.First(&user,id).Error
+	if err!=nil{
+		ZapLog.ZapLogger.Error("用户不存在:"+err.Error())
+		return consts.ERRORCODE
+	}
+	err=model.GormDb.Create(&category).Error
+	if err!=nil{
+		ZapLog.ZapLogger.Error("创建分类失败:"+err.Error())
+		return consts.ERRORCODE
+	}
+	//创建用户和分类的关联
+	err = model.GormDb.Model(&user).Association("Categorys").Append(category)
+	if err != nil {
+		ZapLog.ZapLogger.Error("用户分类表关联失败:"+err.Error())
+		return  consts.FailUserLinkDetailsCode
+	}
+	return consts.SUCCSECODE
+}
+
+//获取分类
+func GetCate(pageSize int, pageNum int) ([]model.Category,int, int64) {
+	var cate []model.Category
+	var total int64
+	err = model.GormDb.Find(&cate).Limit(pageSize).Offset((pageNum - 1) * pageSize).Error
+	model.GormDb.Model(&cate).Count(&total)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		ZapLog.ZapLogger.Error("获取分类失败:"+err.Error())
+		return nil, consts.FailGetCategoryCode,0
+	}
+	return cate, consts.SUCCSECODE,total
+}
+
+// EditCate 编辑分类信息
+func EditCate(cateid int, category *model.Category) int {
+	var mp = make(map[string]interface{})
+	mp["name"] = category.Name
+	err = model.GormDb.Model(&category).Where("id = ? ", cateid).Updates(mp).Error
+	if err != nil {
+		ZapLog.ZapLogger.Error("编辑分类失败:"+err.Error())
+		return consts.FailUpdataCateCode
+	}
+	return consts.SUCCSECODE
+}
+
+// DeleteCate 删除分类
+func DeleteCate(id,cateid int) int {
+	var category model.Category
+	err = model.GormDb.Where("id = ? ", cateid).Delete(&category).Error
+	if err != nil {
+		return consts.FailDeleCateCode
+	}
+	var user model.User
+	model.GormDb.First(&user,id)
+	err =model.GormDb.Model(&user).Association("Categorys").Delete(&category)
+	if err != nil {
+		ZapLog.ZapLogger.Error("删除分类失败:"+err.Error())
+		return consts.FailDeleCateCode
+	}
+	return consts.SUCCSECODE
+}
+

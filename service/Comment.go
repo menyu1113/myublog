@@ -1,106 +1,57 @@
 package service
 
-//
-//import (
-//	"gorm.io/gorm"
-//	"myublog/model"
-//)
-//
-//
-//
-//// AddComment 新增评论
-//func AddComment(data *Comment) int {
-//	err = model.GormDb.Create(&data).Error
-//	if err != nil {
-//		return errmsg.ERROR
-//	}
-//	return errmsg.SUCCSE
-//}
-//
-//// GetComment 查询单个评论
-//func GetComment(id int) (Comment, int) {
-//	var comment Comment
-//	err = model.GormDb.Where("id = ?", id).First(&comment).Error
-//	if err != nil {
-//		return comment, errmsg.ERROR
-//	}
-//	return comment, errmsg.SUCCSE
-//}
-//
-//// GetCommentList 后台所有获取评论列表
-//func GetCommentList(pageSize int, pageNum int) ([]Comment, int64, int) {
-//
-//	var commentList []Comment
-//	var total int64
-//	model.GormDb.Find(&commentList).Count(&total)
-//	err = model.GormDb.Model(&commentList).Limit(pageSize).Offset((pageNum - 1) * pageSize).Order("Created_At DESC").Select("comment.id, article.title,user_id,article_id, user.username, comment.content, comment.status,comment.created_at,comment.deleted_at").Joins("LEFT JOIN article ON comment.article_id = article.id").Joins("LEFT JOIN user ON comment.user_id = user.id").Scan(&commentList).Error
-//	if err != nil {
-//		return commentList, 0, errmsg.ERROR
-//	}
-//	return commentList, total, errmsg.SUCCSE
-//}
-//
-//// GetCommentCount 获取评论数量
-//func GetCommentCount(id int) int64 {
-//	var comment Comment
-//	var total int64
-//	model.GormDb.Find(&comment).Where("article_id = ?", id).Where("status = ?", 1).Count(&total)
-//	return total
-//}
-//
-//// GetCommentListFront 展示页面获取评论列表
-//func GetCommentListFront(id int, pageSize int, pageNum int) ([]Comment, int64, int) {
-//	var commentList []Comment
-//	var total int64
-//	model.GormDb.Find(&Comment{}).Where("article_id = ?", id).Where("status = ?", 1).Count(&total)
-//	err = model.GormDb.Model(&Comment{}).Limit(pageSize).Offset((pageNum-1)*pageSize).Order("Created_At DESC").Select("comment.id, article.title, user_id, article_id, user.username, comment.content, comment.status,comment.created_at,comment.deleted_at").Joins("LEFT JOIN article ON comment.article_id = article.id").Joins("LEFT JOIN user ON comment.user_id = user.id").Where("article_id = ?",
-//		id).Where("status = ?", 1).Scan(&commentList).Error
-//	if err != nil {
-//		return commentList, 0, errmsg.ERROR
-//	}
-//	return commentList, total, errmsg.SUCCSE
-//}
-//
-//// 编辑评论（暂不允许编辑评论）
-//
-//// DeleteComment 删除评论
-//func DeleteComment(id uint) int {
-//	var comment Comment
-//	err = model.GormDb.Where("id = ?", id).Delete(&comment).Error
-//	if err != nil {
-//		return errmsg.ERROR
-//	}
-//	return errmsg.SUCCSE
-//}
-//
-//// CheckComment 通过评论
-//func CheckComment(id int, data *Comment) int {
-//	var comment Comment
-//	var res Comment
-//	var article Article
-//	var maps = make(map[string]interface{})
-//	maps["status"] = data.Status
-//
-//	err = model.GormDb.Model(&comment).Where("id = ?", id).Updates(maps).First(&res).Error
-//	model.GormDb.Model(&article).Where("id = ?", res.ArticleId).UpdateColumn("comment_count", gorm.Expr("comment_count + ?", 1))
-//	if err != nil {
-//		return errmsg.ERROR
-//	}
-//	return errmsg.SUCCSE
-//}
-//
-//// UncheckComment 撤下评论
-//func UncheckComment(id int, data *Comment) int {
-//	var comment Comment
-//	var res Comment
-//	var article Article
-//	var maps = make(map[string]interface{})
-//	maps["status"] = data.Status
-//
-//	err = model.GormDb.Model(&comment).Where("id = ?", id).Updates(maps).First(&res).Error
-//	model.GormDb.Model(&article).Where("id = ?", res.ArticleId).UpdateColumn("comment_count", gorm.Expr("comment_count - ?", 1))
-//	if err != nil {
-//		return errmsg.ERROR
-//	}
-//	return errmsg.SUCCSE
-//}
+import (
+	"myublog/global/consts"
+	"myublog/middleware/ZapLog"
+	"myublog/model"
+)
+//增加评论
+func AddComment(id, articleid int, comment *model.Comment) int {
+	var user model.User
+	var aricle model.Article
+	if model.GormDb.First(&user, id).Error != nil || model.GormDb.First(&aricle, articleid).Error != nil {
+		ZapLog.ZapLogger.Error("用户或者文章不存在")
+		return consts.ERRORCODE
+	}
+	err := model.GormDb.Create(&comment).Error
+	if err != nil {
+		ZapLog.ZapLogger.Error("新增评论失败:" + err.Error())
+		return consts.ERRORCODE
+	}
+	//添加关联
+	err = model.GormDb.Model(&user).Association("Comments").Append(comment)
+	if err != nil {
+		ZapLog.ZapLogger.Error("用户评论表关联数据失败:" + err.Error())
+		_ = model.GormDb.Delete(&comment).Error
+		return consts.FailUserLinkDetailsCode
+	}
+	err = model.GormDb.Model(&aricle).Association("Comments").Append(comment)
+	if err != nil {
+		ZapLog.ZapLogger.Error("文章评论表关联数据失败:" + err.Error())
+		_ = model.GormDb.Delete(&comment).Error
+		return consts.FailUserLinkDetailsCode
+	}
+	return consts.SUCCSECODE
+}
+
+//删除评论
+func DeleteComment(id uint) int {
+	var comment model.Comment
+	//comment的id应该要提前判断一下  这里没有判断，结果就是没有删除，但是返回还是成功的
+	err = model.GormDb.Where("id = ?", id).Delete(&comment).Error
+	if err != nil {
+		return consts.FailDeleCommentCode
+	}
+	return consts.SUCCSECODE
+}
+
+//获取文章所有
+func GetComment(id uint) (code int,comment []model.Comment) {
+	var article model.Article
+	err:=model.GormDb.Preload("Comments").First(&article,"id = ?",id).Error
+	if err!=nil{
+		ZapLog.ZapLogger.Error("获取文章所有失败:"+err.Error())
+		return consts.FailGetCommentCode,nil
+	}
+	return consts.SUCCSECODE,article.Comments
+}

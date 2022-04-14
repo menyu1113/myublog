@@ -4,8 +4,8 @@ import (
 	"errors"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"log"
 	"myublog/global/consts"
+	"myublog/middleware/ZapLog"
 	"myublog/model"
 )
 
@@ -15,10 +15,12 @@ var err error
 func CreateUser(user *model.User) int {
 	user.Password, err = encrypTion(user.Password)
 	if err != nil {
+		ZapLog.ZapLogger.Error("密码加密失败:"+err.Error())
 		return consts.CurdCreatFailCode
 	}
 	err = model.GormDb.Create(&user).Error
 	if err != nil {
+		ZapLog.ZapLogger.Error("创建用户失败:"+err.Error())
 		return consts.CurdCreatFailCode
 	}
 	return consts.SUCCSECODE
@@ -28,7 +30,6 @@ func CreateUser(user *model.User) int {
 func encrypTion(password string) (string, error) {
 	fromPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Printf("密码加密失败 %s\n", err)
 		return "", err
 	}
 	return string(fromPassword), nil
@@ -39,7 +40,7 @@ func CheckUser(name string) bool {
 	var user model.User
 	//用户存在，Error如果为nil 那么errors.Is就是false, 取反就是不存在
 	if !errors.Is(model.GormDb.Where("username = ?", name).First(&user).Error, gorm.ErrRecordNotFound) {
-		log.Printf("%s ", gorm.ErrRecordNotFound)
+		ZapLog.ZapLogger.Error(gorm.ErrRecordNotFound.Error())
 		return false //（不存在返回false）
 	}
 	return true
@@ -93,6 +94,7 @@ func EditUser(id int, user *model.User) int {
 	mp["role"] = user.Role
 	err = model.GormDb.Model(&user).Where("id = ?", id).Updates(mp).Error
 	if err != nil {
+		ZapLog.ZapLogger.Error("更新用户失败:"+err.Error())
 		return consts.CurdUpdateFailCode
 	}
 	return consts.SUCCSECODE
@@ -126,6 +128,7 @@ func DeleteUser(id int) (code int) {
 	var user model.User
 	err = model.GormDb.Model(&user).Where("id = ?", id).Delete(&user).Error
 	if err != nil {
+		ZapLog.ZapLogger.Error("删除用户失败:"+err.Error())
 		return consts.CurdDeleteFailCode
 	}
 	return consts.SUCCSECODE

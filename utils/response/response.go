@@ -7,11 +7,19 @@ import (
 )
 
 func ResponseJson(c *gin.Context, httpCode int, dataCode int, msg string, data interface{}) {
-	c.JSON(httpCode, gin.H{
-		"code": dataCode,
-		"msg":  msg,
-		"data": data,
-	})
+	if data != nil {
+		c.JSON(httpCode, gin.H{
+			"code": dataCode,
+			"msg":  msg,
+			"data": data,
+		})
+	} else {
+		c.JSON(httpCode, gin.H{
+			"code": dataCode,
+			"msg":  msg,
+		})
+	}
+
 }
 func Success(c *gin.Context, msg string, data ...interface{}) {
 	ResponseJson(c, http.StatusOK, consts.SUCCSECODE, msg, data)
