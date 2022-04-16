@@ -22,7 +22,6 @@ func Login(c *gin.Context) {
 		//response.Response(c,code,myerrors.GetErrMsg(code))
 		return
 	}
-
 	token, err := utiljwt.GenerateToken(user)
 	if err != nil {
 		log.Printf("生成token fail%s\n", err)
@@ -31,4 +30,3 @@ func Login(c *gin.Context) {
 	//c.SetCookie("token",token ,3600, "/", "localhost", false, true)
 	response.Success(c, myerrors.GetErrMsg(code), token)
 }
-

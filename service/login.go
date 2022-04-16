@@ -21,7 +21,7 @@ func CheckLogin(username string, password string) int {
 	//密码错误
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return myerrors.ERROR_PASSWORD_Code
+		return myerrors.FailPasswordCode
 	}
 	return myerrors.SUCCSECODE
 

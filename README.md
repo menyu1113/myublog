@@ -11,19 +11,25 @@
 ├─config // 项目配置入口   
 ├─database  // 数据库备份文件（初始化）
 ├─global  //全局配置
-│   │__consts 自定义错误及其他常量
-│   │__viperis 配置加载
-├─logs  // 日志
+│  ├─myerrors 自定义错误及其他常量
+│  ├─gorm //mysql初始化
+│  ├─initredis //redis初始化
+│  ├─viperis 配置加载
+│  └─global // 全局变量声明
+├─logs  // 日志路径
 ├─middleware  // 中间件
-│  └─zaplog //zap日志   
+│  ├─loglog //日志中间件
+│  ├─cors //跨域中间件
+│  └─jwt //token中间件
 ├─model // 模型层
 ├─routes
 │  └─router.go // 路由入口   
 ├─service // 服务层             
 ├─utils // 工具库
-│  │  
+│  ├─md5x //md5加密 
 │  ├─response //数据返回响应   
-│  ├─validators //参数验证   
+│  ├─validators //参数验证
+│  ├─zaplog //日志工具      
 │  └─utiljwt //jwt 
 ├─ air.conf  
 ├─  .gitignore
