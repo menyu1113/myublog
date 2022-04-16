@@ -32,6 +32,14 @@ var (
 	SecretKey  string
 	Bucket     string
 	QiniuSever string
+
+	RedisAddr string
+	RedisPassword string
+	RedisMinIdleConns  int
+	RedisIndexDb  int
+	RedisFailDialTimeout  int
+
+
 )
 
 func init() {
@@ -49,6 +57,7 @@ func init() {
 	LoadRouter()
 	LoadLog()
 	//LoadQiniu()
+	Loadredis()
 
 }
 func LoadDb() {
@@ -79,4 +88,11 @@ func LoadQiniu() {
 	SecretKey = viper.GetString("Qiniu.SecretKey")
 	Bucket = viper.GetString("Qiniu.Bucket")
 	QiniuSever = viper.GetString("Qiniu.QiniuSever")
+}
+func Loadredis() {
+	RedisAddr = viper.GetString("Redis.Addr")
+	RedisPassword= viper.GetString("Redis.Password")
+	RedisMinIdleConns = viper.GetInt("Redis.FailDialTimeout")
+	RedisIndexDb = viper.GetInt("Redis.IndexDb")
+	RedisFailDialTimeout = viper.GetInt("Redis.FailDialTimeout")
 }

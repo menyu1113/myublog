@@ -1,4 +1,4 @@
-package model
+package gorm
 
 import (
 	"fmt"
@@ -6,16 +6,16 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
+	"myublog/global"
 	"myublog/global/vipers"
+	"myublog/model"
 	"os"
 	"time"
 )
 
 var (
 	err    error
-	GormDb *gorm.DB
 )
-
 func InitDb() {
 	dns := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?%s&parseTime=True&loc=Local",
 		vipers.DbUser,
@@ -25,7 +25,7 @@ func InitDb() {
 		vipers.DbName,
 		vipers.DBCharset,
 	)
-	GormDb, err = gorm.Open(mysql.Open(dns), &gorm.Config{
+	global.GormDb, err = gorm.Open(mysql.Open(dns), &gorm.Config{
 		// gorm日志模式：silent
 		Logger: logger.Default.LogMode(logger.Silent),
 		// 外键约束
@@ -39,14 +39,15 @@ func InitDb() {
 	})
 
 	if err != nil {
+		global.ZapLogger.Error("连接数据库失败:"+err.Error())
 		fmt.Println("连接数据库失败，请检查参数：", err)
 		os.Exit(1)
 	}
-
+	global.ZapLogger.Info("连接mysql数据库成功:")
 	// 迁移数据表，在没有数据表结构变更时候，建议注释不执行
-	_ = GormDb.AutoMigrate(&User{}, &Article{}, &Category{}, &DetailsUser{}, &Comment{},&Blog{})
+	_ = global.GormDb.AutoMigrate(&model.User{}, &model.Article{}, &model.Category{}, &model.DetailsUser{}, &model.Comment{},&model.Blog{})
 
-	sqlDB, _ := GormDb.DB()
+	sqlDB, _ := global.GormDb.DB()
 	// SetMaxIdleCons 设置连接池中的最大闲置连接数。
 	sqlDB.SetMaxIdleConns(10)
 

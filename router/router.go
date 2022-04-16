@@ -6,7 +6,8 @@ import (
 	v1 "myublog/api/v1"
 	"myublog/global/vipers"
 	"myublog/middleware"
-	"myublog/middleware/ZapLog"
+	"myublog/middleware/Loglog"
+	"net/http"
 )
 
 func createMyRender() multitemplate.Renderer {
@@ -21,8 +22,11 @@ func InitRouter() {
 	}
 	r := gin.New()
 	//r.HTMLRender = createMyRender()
-	r.Use(gin.Recovery())
-	r.Use(ZapLog.ZapLogs()) //日志中间件
+	//设置没有路由时访问的页面（以免出现404）
+	r.NoRoute(func(c *gin.Context) {
+		c.JSON(http.StatusNotFound, gin.H{"msg" : "该页面不存在，请重新输入！"})
+	})
+	r.Use(gin.Recovery(), Loglog.ZapLogs()) //全局中间件
 	if vipers.AllowCrossDomain {
 		r.Use(middleware.Cors())
 	}

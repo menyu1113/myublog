@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
-	"myublog/global/consts"
+	"myublog/global/myerrors"
 	"myublog/model"
 	"myublog/service"
 	"myublog/utils/response"
@@ -20,20 +20,20 @@ func UserRegister(c *gin.Context) {
 		log.Printf("参数绑定失败:%s\n", err)
 	}
 	msg, validCode := validators.Verification(&user)
-	if validCode != consts.SUCCSECODE {
+	if validCode != myerrors.SUCCSECODE {
 		response.Fail(c, validCode, msg)
 		c.Abort()
 		return
 	}
 	//查询当前用户名是否存在
 	if !service.CheckUser(user.Username) { //用户已存在
-		response.Fail(c, consts.CurdCreatFailExistCode, consts.CurdCreatFailExist, "")
+		response.Fail(c, myerrors.CurdCreatFailExistCode, myerrors.CurdCreatFailExist, "")
 		return
 	}
-	if service.CreateUser(&user) == consts.CurdCreatFailCode {
-		response.Fail(c, consts.CurdCreatFailCode, consts.CurdCreatFailMsg, "")
+	if service.CreateUser(&user) == myerrors.CurdCreatFailCode {
+		response.Fail(c, myerrors.CurdCreatFailCode, myerrors.CurdCreatFailMsg, "")
 	} else {
-		response.Success(c, consts.SUCCSE)
+		response.Success(c, myerrors.SUCCSE)
 	}
 
 }
@@ -44,7 +44,7 @@ func QueryUserList(c *gin.Context) {
 	pageNum, _ := strconv.Atoi(c.Query("pagenum"))
 	username := c.Query("username")
 	data, total := service.GetUsers(username, pageSize, pageNum)
-	response.Success(c, consts.SUCCSE, data, total)
+	response.Success(c, myerrors.SUCCSE, data, total)
 }
 
 //编辑用户
@@ -56,20 +56,20 @@ func EditUser(c *gin.Context) {
 		log.Printf("参数绑定失败:%s\n", err)
 	}
 	code := service.EditUser(id, &user)
-	if code != consts.SUCCSECODE {
-		response.Fail(c, code, consts.GetErrMsg(code))
+	if code != myerrors.SUCCSECODE {
+		response.Fail(c, code, myerrors.GetErrMsg(code))
 		return
 	}
 	//更改信息成功后，重新生成token并返回
 
-	response.Success(c, consts.GetErrMsg(code))
+	response.Success(c, myerrors.GetErrMsg(code))
 }
 
 //删除用户
 func DeleteUser(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	code := service.DeleteUser(id)
-	response.Response(c, code, consts.GetErrMsg(code))
+	response.Response(c, code, myerrors.GetErrMsg(code))
 }
 
 //修改密码
@@ -80,13 +80,13 @@ func ChangeUserPassword(c *gin.Context) {
 	err := c.ShouldBindJSON(&user)
 	if err != nil {
 		fmt.Println("user:", user)
-		response.Fail(c, consts.BindParameterCode, consts.GetErrMsg(consts.BindParameterCode))
+		response.Fail(c, myerrors.BindParameterCode, myerrors.GetErrMsg(myerrors.BindParameterCode))
 		return
 	}
 	code := service.ChangePassword(id, &user)
-	if code != consts.SUCCSECODE {
-		response.Fail(c, code, consts.PasswordChangeFailed)
+	if code != myerrors.SUCCSECODE {
+		response.Fail(c, code, myerrors.PasswordChangeFailed)
 		return
 	}
-	response.Response(c, code, consts.GetErrMsg(code))
+	response.Response(c, code, myerrors.GetErrMsg(code))
 }

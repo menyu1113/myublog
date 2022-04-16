@@ -2,7 +2,7 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
-	"myublog/global/consts"
+	"myublog/global/myerrors"
 	"myublog/model"
 	"myublog/service"
 	"myublog/utils/response"
@@ -13,7 +13,7 @@ import (
 func GetDetails(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	data, code := service.GetDetails(id)
-	response.Response(c, code, consts.GetErrMsg(code), data)
+	response.Response(c, code, myerrors.GetErrMsg(code), data)
 }
 
 //更新用户详情
@@ -22,7 +22,7 @@ func UpdateDetails(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	_ = c.ShouldBindJSON(&data)
 	code := service.UpdateDetails(id, &data)
-	response.Response(c, code, consts.GetErrMsg(code))
+	response.Response(c, code, myerrors.GetErrMsg(code))
 }
 //添加用户详情
 func AddUserDetail(c *gin.Context){
@@ -30,9 +30,9 @@ func AddUserDetail(c *gin.Context){
 	id, _ := strconv.Atoi(c.Param("id"))
 	_ = c.ShouldBindJSON(&detail)
 	code:=service.AddUserDetail(&detail,id)
-	if code !=consts.SUCCSECODE{
-		response.Fail(c,code,consts.GetErrMsg(code))
+	if code != myerrors.SUCCSECODE{
+		response.Fail(c,code, myerrors.GetErrMsg(code))
 		return
 	}
-	response.Success(c,consts.GetErrMsg(code))
+	response.Success(c, myerrors.GetErrMsg(code))
 }

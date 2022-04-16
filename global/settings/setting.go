@@ -10,7 +10,7 @@ package settings
 //	DateFormat         = "2006-01-02 15:04:05" //  设置全局日期时间格式
 //
 //	// 全局日志指针
-//	ZapLog *zap.Logger
+//	Loglog *zap.Logger
 //	// 全局配置文件
 //	ConfigYml       yamls.YmlConfigInterf // 全局配置文件指针
 //	ConfigGormv2Yml yamls.YmlConfigInterf // 全局配置文件指针

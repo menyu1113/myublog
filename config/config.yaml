@@ -13,17 +13,6 @@ Gorm: # 只针对 gorm  操作数据库有效
   SetConnMaxLifetime: 60    # 连接不活动时的最大生存时间(秒)
   #ReConnectInterval: 1    # 保留项,重连数据库间隔秒数
   #PingFailRetryTimes: 3   # 保留项,最大重连次数
-#  Read:
-#    Host: "127.0.0.1"
-#    DataBase: "db_myublog"
-#    Port: 3308                        #注意，非3306，请自行调整
-#    Prefix: "tb_"
-#    User: "root"
-#    Pass: "quanpeng123"
-#    Charset: "utf8"
-#    SetMaxIdleConns: 10
-#    SetMaxOpenConns: 128
-#    SetConnMaxLifetime: 60
 
 
 HttpServer:
@@ -47,34 +36,28 @@ Token:
   IsCacheToRedis: 0                #用户token是否缓存到redis, 如果已经正确配置了redis,建议设置为1, 开启redis缓存token，（1=用户token缓存到redis; 0=token只存在于mysql）
 
 Redis:
-  Host: "127.0.0.1"
-  Port: 6379
-  Auth: ""
-  MaxIdle: 10
-  MaxActive: 1000
-  IdleTimeout: 60
-  IndexDb: 1
-  ConnFailRetryTimes: 3    #从连接池获取连接失败，最大重试次数
-  ReConnectInterval: 1     # 从连接池获取连接失败，每次重试之间间隔的秒数
+  Addr: "81.69.27.140:6379"
+  FailDialTimeout: 10              #连接建立超时时间，默认5秒。
+  Password: "foobared"
+  IndexDb: 0                       # redis数据库index
+  MinIdleConns: 3                  # 命令执行失败时，最多重试多少次，默认为0即不重试
 
 Logs:
   myuLogFilename: "logs/myublog.log"                  #日志文件
-  TextLogFormat: "console"                                #记录日志的格式，参数选项：console、json ， console 表示一般的文本格式
-  TimePrecision: "millisecond"                         #记录日志时，相关的时间精度，该参数选项：second  、 millisecond ， 分别表示 秒 和 毫秒 ,默认为毫秒级别
-  MaxSize: 10                                           #每个日志的最大尺寸(以MB为单位）， 超过该值，系统将会自动进行切割
-  MaxBackups: 20                                        #保留旧日志最大个数
-  MaxAge: 15                                           #保留旧日志最大天数
-  Compress: false                                      #日志备份时，是否进行压缩,默认不压缩（false）
+  TextLogFormat: "console"                            #记录日志的格式，参数选项：console、json ， console 表示一般的文本格式
+  TimePrecision: "millisecond"                        #记录日志时，相关的时间精度，该参数选项：second  、 millisecond ， 分别表示 秒 和 毫秒 ,默认为毫秒级别
+  MaxSize: 10                                         #每个日志的最大尺寸(以MB为单位）， 超过该值，系统将会自动进行切割
+  MaxBackups: 20                                      #保留旧日志最大个数
+  MaxAge: 15                                          #保留旧日志最大天数
+  Compress: false                                     #日志备份时，是否进行压缩,默认不压缩（false）
 
-SnowFlake:
-  SnowFlakeMachineId: 2               #如果本项目同时部署在多台机器，并且需要同时使用该算法，请为每一台机器设置不同的ID，区间范围: [0,1023]
 
 FileUploadSetting:
-  Size: 32                            #设置上传文件的最大值，单位：M，注意： 如果go前置nginx服务器，nginx 默认限制文件上传大小为 50 M ,用户上传文件限制还需要继续修改 nginx 配置
-  UploadFileField: "file"            #post上传文件时，表单的键名
-  UploadFileSavePath: "/storage/app/uploaded/" #上传文件保存在路径, 该路径与 BasePath 进行拼接使用
-  UploadFileReturnPath: "/public/storage/uploaded/"  # 文件上后返回的路径，由于程序会自动创建软连接，自动将资源定位到实际路径，所有资源的访问入口建议都从public开始
-  AllowMimeType: #允许的文件mime类型列表
+  Size: 32                                            #设置上传文件的最大值，单位：M，注意： 如果go前置nginx服务器，nginx 默认限制文件上传大小为 50 M ,用户上传文件限制还需要继续修改 nginx 配置
+  UploadFileField: "file"                             #post上传文件时，表单的键名
+  UploadFileSavePath: "/storage/app/uploaded/"        #上传文件保存在路径, 该路径与 BasePath 进行拼接使用
+  UploadFileReturnPath: "/public/storage/uploaded/"   # 文件上后返回的路径，由于程序会自动创建软连接，自动将资源定位到实际路径，所有资源的访问入口建议都从public开始
+  AllowMimeType:                                      #允许的文件mime类型列表
     - "image/jpeg"                    #jpg、jpeg图片格式
     - "image/png"                     #png图片格式
     - "image/x-icon"                  #ico图片
@@ -85,11 +68,6 @@ FileUploadSetting:
     - "video/mp4"      #视频文件，例如：mp4
     - "audio/mpeg"     #音频文件，例如: mp3
 
-#验证码(包括中间件)配置信息
-Captcha:
-  captchaId: "captcha_id"  # 验证码id提交时的键名
-  captchaValue: "captcha_value"   #验证码值提交时的键名
-  length: 4   # 验证码生成时的长度
 #七牛云
 Qiniu:
   AccessKey:

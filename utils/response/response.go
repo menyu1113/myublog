@@ -2,7 +2,7 @@ package response
 
 import (
 	"github.com/gin-gonic/gin"
-	"myublog/global/consts"
+	"myublog/global/myerrors"
 	"net/http"
 )
 
@@ -22,7 +22,7 @@ func ResponseJson(c *gin.Context, httpCode int, dataCode int, msg string, data i
 
 }
 func Success(c *gin.Context, msg string, data ...interface{}) {
-	ResponseJson(c, http.StatusOK, consts.SUCCSECODE, msg, data)
+	ResponseJson(c, http.StatusOK, myerrors.SUCCSECODE, msg, data)
 }
 func Fail(c *gin.Context, dataCode int, msg string, data ...interface{}) {
 	ResponseJson(c, http.StatusBadRequest, dataCode, msg, data)
@@ -31,7 +31,7 @@ func Fail(c *gin.Context, dataCode int, msg string, data ...interface{}) {
 
 //封装返回参数
 func Response(c *gin.Context, dataCode int, msg string, data ...interface{}) {
-	if dataCode != consts.SUCCSECODE {
+	if dataCode != myerrors.SUCCSECODE {
 		Success(c, msg, data)
 		return
 	} else {

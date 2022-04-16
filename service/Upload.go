@@ -5,7 +5,7 @@ import (
 	"github.com/qiniu/go-sdk/v7/auth/qbox"
 	"github.com/qiniu/go-sdk/v7/storage"
 	"mime/multipart"
-	"myublog/global/consts"
+	"myublog/global/myerrors"
 	"myublog/global/vipers"
 )
 
@@ -31,9 +31,9 @@ func UpLoadFile(file multipart.File, fileSize int64) (string, int) {
 
 	err := formUploader.PutWithoutKey(context.Background(), &ret, upToken, file, fileSize, &putExtra)
 	if err != nil {
-		return "", consts.ERRORCODE
+		return "", myerrors.ERRORCODE
 	}
 	url := ImgUrl + ret.Key
-	return url, consts.SUCCSECODE
+	return url, myerrors.SUCCSECODE
 
 }

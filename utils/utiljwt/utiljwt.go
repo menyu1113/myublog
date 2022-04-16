@@ -4,6 +4,8 @@ import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"myublog/global/vipers"
+	"myublog/model"
+	"time"
 )
 
 type JWT struct {
@@ -64,4 +66,24 @@ func (j *JWT) ParserToken(tokenString string) (*MyClaims, error) {
 		return nil, TokenInvalid
 	}
 	return nil, TokenInvalid
+}
+
+
+//为user生成token令牌
+func GenerateToken(user model.User) (string, error) {
+	claims := MyClaims{
+		Username: user.Username,
+		//Id: user.ID,
+		StandardClaims: jwt.StandardClaims{
+			NotBefore: time.Now().Unix() - 100,
+			ExpiresAt: time.Now().Unix() + 1209600,
+			Issuer:    "myu",
+		},
+	}
+	j := NewJWT()
+	token, err := j.CreateToken(claims)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }
