@@ -32,6 +32,7 @@ var (
 	TokenMalformed     error = errors.New("Token不正确,请重新登录")
 	TokenInvalid       error = errors.New("这不是一个Token,请重新登录")
 	TokenNoCurrentUser error = errors.New("Token与ID不匹配")
+	TokenBlackList     error = errors.New("Token在黑名单")
 )
 
 // CreateToken 生成token
@@ -67,7 +68,6 @@ func (j *JWT) ParserToken(tokenString string) (*MyClaims, error) {
 	}
 	return nil, TokenInvalid
 }
-
 
 //为user生成token令牌
 func GenerateToken(user model.User) (string, error) {

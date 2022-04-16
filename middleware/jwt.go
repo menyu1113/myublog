@@ -5,8 +5,10 @@ import (
 	"myublog/global"
 	"myublog/global/myerrors"
 	"myublog/model"
+	"myublog/service"
 	"myublog/utils/response"
 	"myublog/utils/utiljwt"
+	"strconv"
 	"strings"
 )
 
@@ -31,27 +33,31 @@ func JwtToken() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		//判断token是否在黑名单中
+		if service.IsInBlacklist(checkToken[1]) {
+			response.Fail(c, myerrors.ERRORCODE, utiljwt.TokenBlackList.Error())
+			c.Abort()
+			return
+		}
 		j := utiljwt.NewJWT()
 		// 解析token
-		claims, err := j.ParserToken(checkToken[1])
+		myclaims, err := j.ParserToken(checkToken[1])
 		if err != nil {
 			if err == utiljwt.TokenExpired {
 				response.Fail(c, myerrors.ERRORCODE, utiljwt.TokenExpired.Error())
-				c.Abort()
-				return
 			}
 			response.Fail(c, myerrors.ERRORCODE, err.Error())
 			c.Abort()
 			return
 		}
 		//检查token是不是当前用户的
-		//id, _ := strconv.Atoi(c.Param("id"))
-		//if !check(id, claims.Username) {
-		//	response.Fail(c, myerrors.ERRORCODE, utiljwt.TokenNoCurrentUser.Error())
-		//	c.Abort()
-		//	return
-		//}
-		c.Set("claims", claims)
+		id, _ := strconv.Atoi(c.Param("id"))
+		if !check(id, myclaims.Username) {
+			response.Fail(c, myerrors.ERRORCODE, utiljwt.TokenNoCurrentUser.Error())
+			c.Abort()
+			return
+		}
+		c.Set("myclaims", myclaims)
 		c.Next()
 	}
 }

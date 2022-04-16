@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
+	"myublog/global"
 	"myublog/global/myerrors"
 	"myublog/model"
 	"myublog/service"
 	"myublog/utils/response"
+	"myublog/utils/utiljwt"
 	"myublog/utils/validators"
 	"strconv"
+	"strings"
 )
 
 //用户注册
@@ -69,7 +72,19 @@ func EditUser(c *gin.Context) {
 func DeleteUser(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	code := service.DeleteUser(id)
-	response.Response(c, code, myerrors.GetErrMsg(code))
+	if code != myerrors.SUCCSECODE {
+		response.Fail(c, code, myerrors.GetErrMsg(code))
+	}
+	//添加token至黑名单
+	myclaims, _ := c.Get("myclaims")
+	TokenString := strings.Split(c.Request.Header.Get("Authorization"), " ")[1]
+	err := service.JoinBlackList(TokenString, myclaims.(*utiljwt.MyClaims))
+	if err != nil {
+		global.ZapLogger.Error("添加token黑名单失败")
+		return
+	}
+	global.ZapLogger.Info("添加token黑名单成功!")
+	response.Success(c, myerrors.GetErrMsg(code))
 }
 
 //修改密码
