@@ -100,7 +100,7 @@ func ChangeUserPassword(c *gin.Context) {
 	}
 	code := service.ChangePassword(id, &user)
 	if code != myerrors.SUCCSECODE {
-		response.Fail(c, code, myerrors.PasswordChangeFailed)
+		response.Fail(c, code, myerrors.GetErrMsg(code))
 		return
 	}
 	response.Response(c, code, myerrors.GetErrMsg(code))

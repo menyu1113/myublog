@@ -15,12 +15,12 @@ var err error
 func CreateUser(user *model.User) int {
 	user.Password, err = encrypTion(user.Password)
 	if err != nil {
-		global.ZapLogger.Error("密码加密失败:"+err.Error())
+		global.ZapLogger.Error("密码加密失败:" + err.Error())
 		return myerrors.CurdCreatFailCode
 	}
 	err = global.GormDb.Create(&user).Error
 	if err != nil {
-		global.ZapLogger.Error("创建用户失败:"+err.Error())
+		global.ZapLogger.Error("创建用户失败:" + err.Error())
 		return myerrors.CurdCreatFailCode
 	}
 	return myerrors.SUCCSECODE
@@ -94,7 +94,7 @@ func EditUser(id int, user *model.User) int {
 	mp["role"] = user.Role
 	err = global.GormDb.Model(&user).Where("id = ?", id).Updates(mp).Error
 	if err != nil {
-		global.ZapLogger.Error("更新用户失败:"+err.Error())
+		global.ZapLogger.Error("更新用户失败:" + err.Error())
 		return myerrors.CurdUpdateFailCode
 	}
 	return myerrors.SUCCSECODE
@@ -110,7 +110,7 @@ func CheckUerAndId(id int, name string) (code int) {
 	//if err !=nil{
 	//	return myerrors.CurdFailNotExistCode
 	//}
-	user= model.User{}
+	user = model.User{}
 	//用户是否存在
 	global.GormDb.Select("id, username").Where("username = ?", name).First(&user)
 	//fmt.Printf("name:%v, id:%v, user.Username:%v,user.ID:%v\n",name,id,user.Username,user.ID)
@@ -128,11 +128,13 @@ func DeleteUser(id int) (code int) {
 	var user model.User
 	err = global.GormDb.Model(&user).Where("id = ?", id).Delete(&user).Error
 	if err != nil {
-		global.ZapLogger.Error("删除用户失败:"+err.Error())
+		global.ZapLogger.Error("删除用户失败:" + err.Error())
 		return myerrors.CurdDeleteFailCode
 	}
 	return myerrors.SUCCSECODE
 }
+
+//修改密码
 func ChangePassword(id int, user *model.User) (code int) {
 	//查传过来的ID是不是当前用户ID，不是不能改
 	var temp model.User
@@ -143,7 +145,7 @@ func ChangePassword(id int, user *model.User) (code int) {
 	user.Password, _ = encrypTion(user.Password) //加密
 	err = global.GormDb.Select("password").Where("id = ?", id).Updates(&user).Error
 	if err != nil {
-		return myerrors.ERRORCODE
+		return myerrors.CurdChangeFailedPasswordCode
 	}
 	return myerrors.SUCCSECODE
 }
