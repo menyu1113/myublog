@@ -5,8 +5,8 @@ Gorm: # 只针对 gorm  操作数据库有效
   Host: "127.0.0.1"
   DbName: "db_myublog"
   Port: 3306
-  User: "root"
-  Password: "quanpeng123"
+  User: ""
+  Password: ""
   Charset: "utf8"
   SetMaxIdleConns: 10
   SetMaxOpenConns: 128
@@ -36,9 +36,9 @@ Token:
   IsCacheToRedis: 0                #用户token是否缓存到redis, 如果已经正确配置了redis,建议设置为1, 开启redis缓存token，（1=用户token缓存到redis; 0=token只存在于mysql）
 
 Redis:
-  Addr: "81.69.27.140:6379"
+  Addr: ""                         #IP:Port格式
   FailDialTimeout: 10              #连接建立超时时间，默认5秒。
-  Password: "foobared"
+  Password: ""
   IndexDb: 0                       # redis数据库index
   MinIdleConns: 3                  # 命令执行失败时，最多重试多少次，默认为0即不重试
 
