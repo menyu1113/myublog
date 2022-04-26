@@ -3,7 +3,9 @@ package router
 import (
 	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	v1 "myublog/api/v1"
+	"myublog/global"
 	"myublog/global/vipers"
 	"myublog/middleware"
 	"myublog/middleware/Loglog"
@@ -12,8 +14,8 @@ import (
 
 func createMyRender() multitemplate.Renderer {
 	p := multitemplate.NewRenderer()
-	p.AddFromFiles("admin", "web/admin/dist/index.html")
-	p.AddFromFiles("front", "web/front/dist/index.html")
+	p.AddFromFiles("admin", "web/admin/public/index.html")
+	p.AddFromFiles("front", "web/admin/public/index.html")
 	return p
 }
 func InitRouter() {
@@ -21,10 +23,11 @@ func InitRouter() {
 		gin.SetMode("release")
 	}
 	r := gin.New()
-	//r.HTMLRender = createMyRender()
+	r.HTMLRender = createMyRender()
 	//设置没有路由时访问的页面（以免出现404）
 	r.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, gin.H{"msg" : "该页面不存在，请重新输入！"})
+		global.ZapLogger.Info("页面不存在", zap.Any("URL:", c.Request.RequestURI))
+		c.JSON(http.StatusNotFound, gin.H{"msg": "该页面不存在，请重新输入！"})
 	})
 	r.Use(gin.Recovery(), Loglog.ZapLogs()) //全局中间件
 	if vipers.AllowCrossDomain {
@@ -67,9 +70,9 @@ func InitRouter() {
 		// 上传文件
 		auth.POST("upload", v1.UpLoad)
 		//// 更新个人详情
-		auth.POST("adddetail/:id", v1.AddUserDetail)//为用户加用户详情
-		auth.GET("admin/detail/:id", v1.GetDetails)//获取用户详情
-		auth.PUT("detail/:id", v1.UpdateDetails)//更改用户详情
+		auth.POST("adddetail/:id", v1.AddUserDetail) //为用户加用户详情
+		auth.GET("admin/detail/:id", v1.GetDetails)  //获取用户详情
+		auth.PUT("detail/:id", v1.UpdateDetails)     //更改用户详情
 		//// 评论模块
 		auth.POST("addcomment/:id", v1.AddComment)
 		auth.GET("comment/", v1.GetComment)
