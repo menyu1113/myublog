@@ -24,7 +24,8 @@
 ├─model // 模型层
 ├─routes
 │  └─router.go // 路由入口   
-├─service // 服务层             
+├─service // 服务层
+├─web// 前端页面展示             
 ├─utils // 工具库
 │  ├─md5x //md5加密 
 │  ├─response //数据返回响应   
