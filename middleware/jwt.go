@@ -8,7 +8,6 @@ import (
 	"myublog/service"
 	"myublog/utils/response"
 	"myublog/utils/utiljwt"
-	"strconv"
 	"strings"
 )
 
@@ -43,20 +42,17 @@ func JwtToken() gin.HandlerFunc {
 		// 解析token
 		myclaims, err := j.ParserToken(checkToken[1])
 		if err != nil {
-			if err == utiljwt.TokenExpired {
-				response.Fail(c, myerrors.ERRORCODE, utiljwt.TokenExpired.Error())
-			}
 			response.Fail(c, myerrors.ERRORCODE, err.Error())
 			c.Abort()
 			return
 		}
 		//检查token是不是当前用户的
-		id, _ := strconv.Atoi(c.Param("id"))
-		if !check(id, myclaims.Username) {
-			response.Fail(c, myerrors.ERRORCODE, utiljwt.TokenNoCurrentUser.Error())
-			c.Abort()
-			return
-		}
+		//id, _ := strconv.Atoi(c.Param("id"))
+		//if !check(id, myclaims.Username) {
+		//	response.Fail(c, myerrors.ERRORCODE, utiljwt.TokenNoCurrentUser.Error())
+		//	c.Abort()
+		//	return
+		//}
 		c.Set("myclaims", myclaims)
 		c.Next()
 	}

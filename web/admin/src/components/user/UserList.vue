@@ -12,19 +12,23 @@
           />
         </a-col>
         <a-col :span="4">
-          <a-button type="primary" @click="addUserVisible = true">新增</a-button>
+          <a-button type="primary" @click="addUserVisible = true"
+            >新增</a-button
+          >
         </a-col>
       </a-row>
 
       <a-table
         rowKey="ID"
-        :columns="columns"
-        :pagination="pagination"
-        :dataSource="userlist"
+        :columns='columns'
+        :pagination='pagination'
+        :dataSource='userlist'
         bordered
-        @change="handleTableChange"
+        @change='handleTableChange'
       >
-        <span slot="role" slot-scope="data">{{ data == 1 ? '管理员' : '订阅者' }}</span>
+        <span slot="role" slot-scope="data">{{
+          data === 1 ? '管理员' : '订阅者'
+        }}</span>
         <template slot="action" slot-scope="data">
           <div class="actionSlot">
             <a-button
@@ -32,14 +36,18 @@
               icon="edit"
               style="margin-right: 15px"
               @click="editUser(data.ID)"
-            >编辑</a-button>
+              >编辑</a-button
+            >
             <a-button
               type="danger"
               icon="delete"
               style="margin-right: 15px"
               @click="deleteUser(data.ID)"
-            >删除</a-button>
-            <a-button type="info" icon="info" @click="ChangePassword(data.ID)">修改密码</a-button>
+              >删除</a-button
+            >
+            <a-button type="info" icon="info" @click="ChangePassword(data.ID)"
+              >修改密码</a-button
+            >
           </div>
         </template>
       </a-table>
@@ -103,12 +111,20 @@
       @cancel="changePasswordCancel"
       destroyOnClose
     >
-      <a-form-model :model="changePassword" :rules="changePasswordRules" ref="changePasswordRef">
+      <a-form-model
+        :model="changePassword"
+        :rules="changePasswordRules"
+        ref="changePasswordRef"
+      >
         <a-form-model-item has-feedback label="密码" prop="password">
-          <a-input-password v-model="changePassword.password"></a-input-password>
+          <a-input-password
+            v-model="changePassword.password"
+          ></a-input-password>
         </a-form-model-item>
         <a-form-model-item has-feedback label="确认密码" prop="checkpass">
-          <a-input-password v-model="changePassword.checkpass"></a-input-password>
+          <a-input-password
+            v-model="changePassword.checkpass"
+          ></a-input-password>
         </a-form-model-item>
       </a-form-model>
     </a-modal>
@@ -124,14 +140,14 @@ const columns = [
     dataIndex: 'ID',
     width: '10%',
     key: 'id',
-    align: 'center',
+    align: 'center'
   },
   {
     title: '用户名',
     dataIndex: 'username',
     width: '20%',
     key: 'username',
-    align: 'center',
+    align: 'center'
   },
   {
     title: '注册时间',
@@ -141,7 +157,7 @@ const columns = [
     align: 'center',
     customRender: (val) => {
       return val ? day(val).format('YYYY年MM月DD日 HH:mm') : '暂无'
-    },
+    }
   },
   {
     title: '角色',
@@ -149,87 +165,93 @@ const columns = [
     width: '20%',
     key: 'role',
     align: 'center',
-    scopedSlots: { customRender: 'role' },
+    scopedSlots: { customRender: 'role' }
   },
   {
     title: '操作',
     width: '30%',
     key: 'action',
     align: 'center',
-    scopedSlots: { customRender: 'action' },
-  },
+    scopedSlots: { customRender: 'action' }
+  }
 ]
 
 export default {
-  data() {
+  data () {
     return {
       pagination: {
         pageSizeOptions: ['5', '10', '20'],
         pageSize: 5,
         total: 0,
         showSizeChanger: true,
-        showTotal: (total) => `共${total}条`,
+        showTotal: (total) => `共${total}条`
       },
       userlist: [],
       userInfo: {
         username: '',
         password: '',
         role: 2,
-        checkPass: '',
+        checkPass: ''
       },
       newUser: {
         username: '',
         password: '',
         role: 2,
-        checkPass: '',
+        checkPass: ''
       },
       changePassword: {
         id: 0,
         password: '',
-        checkPass: '',
+        checkPass: ''
       },
       columns,
       queryParam: {
         username: '',
         pagesize: 5,
-        pagenum: 1,
+        pagenum: 1
       },
       editVisible: false,
       userRules: {
         username: [
           {
             validator: (rule, value, callback) => {
-              if (this.userInfo.username == '') {
+              if (this.userInfo.username === '') {
                 callback(new Error('请输入用户名'))
               }
-              if ([...this.userInfo.username].length < 4 || [...this.userInfo.username].length > 12) {
+              if (
+                [...this.userInfo.username].length < 4 ||
+                [...this.userInfo.username].length > 12
+              ) {
                 callback(new Error('用户名应当在4到12个字符之间'))
               } else {
                 callback()
               }
             },
-            trigger: 'blur',
-          },
+            trigger: 'blur'
+          }
         ],
         password: [
           {
             validator: (rule, value, callback) => {
-              if (this.userInfo.password == '') {
+              if (this.userInfo.password === '') {
                 callback(new Error('请输入密码'))
               }
-              if ([...this.userInfo.password].length < 6 || [...this.userInfo.password].length > 20) {
+              if (
+                [...this.userInfo.password].length < 6 ||
+                [...this.userInfo.password].length > 20
+              ) {
                 callback(new Error('密码应当在6到20位之间'))
               } else {
                 callback()
               }
             },
-            trigger: 'blur',
-          },
+            trigger: 'blur'
+          }
         ],
         checkpass: [
           {
             validator: (rule, value, callback) => {
-              if (this.userInfo.checkpass == '') {
+              if (this.userInfo.checkpass === '') {
                 callback(new Error('请输入密码'))
               }
               if (this.userInfo.password !== this.userInfo.checkpass) {
@@ -238,45 +260,51 @@ export default {
                 callback()
               }
             },
-            trigger: 'blur',
-          },
-        ],
+            trigger: 'blur'
+          }
+        ]
       },
       addUserRules: {
         username: [
           {
             validator: (rule, value, callback) => {
-              if (this.newUser.username == '') {
+              if (this.newUser.username === '') {
                 callback(new Error('请输入用户名'))
               }
-              if ([...this.newUser.username].length < 4 || [...this.newUser.username].length > 12) {
+              if (
+                [...this.newUser.username].length < 4 ||
+                [...this.newUser.username].length > 12
+              ) {
                 callback(new Error('用户名应当在4到12个字符之间'))
               } else {
                 callback()
               }
             },
-            trigger: 'blur',
-          },
+            trigger: 'blur'
+          }
         ],
         password: [
           {
             validator: (rule, value, callback) => {
-              if (this.newUser.password == '') {
+              if (this.newUser.password === '') {
                 callback(new Error('请输入密码'))
               }
-              if ([...this.newUser.password].length < 6 || [...this.newUser.password].length > 20) {
+              if (
+                [...this.newUser.password].length < 6 ||
+                [...this.newUser.password].length > 20
+              ) {
                 callback(new Error('密码应当在6到20位之间'))
               } else {
                 callback()
               }
             },
-            trigger: 'blur',
-          },
+            trigger: 'blur'
+          }
         ],
         checkpass: [
           {
             validator: (rule, value, callback) => {
-              if (this.newUser.checkpass == '') {
+              if (this.newUser.checkpass === '') {
                 callback(new Error('请输入密码'))
               }
               if (this.newUser.password !== this.newUser.checkpass) {
@@ -285,48 +313,53 @@ export default {
                 callback()
               }
             },
-            trigger: 'blur',
-          },
-        ],
+            trigger: 'blur'
+          }
+        ]
       },
       changePasswordRules: {
         password: [
           {
             validator: (rule, value, callback) => {
-              if (this.changePassword.password == '') {
+              if (this.changePassword.password === '') {
                 callback(new Error('请输入密码'))
               }
-              if ([...this.changePassword.password].length < 6 || [...this.changePassword.password].length > 20) {
+              if (
+                [...this.changePassword.password].length < 6 ||
+                [...this.changePassword.password].length > 20
+              ) {
                 callback(new Error('密码应当在6到20位之间'))
               } else {
                 callback()
               }
             },
-            trigger: 'blur',
-          },
+            trigger: 'blur'
+          }
         ],
         checkpass: [
           {
             validator: (rule, value, callback) => {
-              if (this.changePassword.checkpass == '') {
+              if (this.changePassword.checkpass === '') {
                 callback(new Error('请输入密码'))
               }
-              if (this.changePassword.password !== this.changePassword.checkpass) {
+              if (
+                this.changePassword.password !== this.changePassword.checkpass
+              ) {
                 callback(new Error('密码不一致，请重新输入'))
               } else {
                 callback()
               }
             },
-            trigger: 'blur',
-          },
-        ],
+            trigger: 'blur'
+          }
+        ]
       },
       editUserVisible: false,
       addUserVisible: false,
-      changePasswordVisible: false,
+      changePasswordVisible: false
     }
   },
-  created() {
+  created () {
     this.getUserList()
   },
   computed: {
@@ -336,48 +369,60 @@ export default {
       } else {
         return false
       }
-    },
+    }
   },
   methods: {
     // 获取用户列表
-    async getUserList() {
-      const { data: res } = await this.$http.get('admin/users', {
-        params: {
-          username: this.queryParam.username,
-          pagesize: this.queryParam.pagesize,
-          pagenum: this.queryParam.pagenum,
-        },
-      })
-      if (res.status !== 200) {
-        if (res.status === 1004 || 1005 || 1006 || 1007) {
-          window.sessionStorage.clear()
+    async getUserList () {
+      try {
+        const { data: res } = await this.axios({
+          url: 'admin/users',
+          method: 'get',
+          params: {
+            username: this.queryParam.username,
+            pagesize: this.queryParam.pagesize,
+            pagenum: this.queryParam.pagenum
+          }
+        })
+        console.log(res)
+        this.userlist = res.data[0]
+        this.pagination.total = res.data.length
+      } catch (err) {
+        console.log(err.response, this, this.$message)
+        if (err.status !== 200) {
+          // window.sessionStorage.clear()
           this.$router.push('/login')
+          return this.$message.error(err.data.msg)
         }
-        this.$message.error(res.message)
       }
-      this.userlist = res.data
-      this.pagination.total = res.total
     },
 
     // 搜索用户
-    async searchUser() {
+    async searchUser () {
       this.queryParam.pagenum = 1
       this.pagination.current = 1
-      const { data: res } = await this.$http.get('admin/users', {
-        params: {
-          username: this.queryParam.username,
-          pagesize: this.queryParam.pagesize,
-          pagenum: this.queryParam.pagenum,
-        },
-      })
-      if (res.status !== 200) return this.$message.error(res.message)
-      this.userlist = res.data
-      this.pagination.total = res.total
+      try {
+        const { data: res } = await this.axios({
+          url: 'admin/users',
+          method: 'get',
+          params: {
+            username: this.queryParam.username,
+            pagesize: this.queryParam.pagesize,
+            pagenum: this.queryParam.pagenum
+          }
+        })
+        this.userlist = res.data[0]
+        this.pagination.total = res.data.length
+      } catch (err) {
+        if (err.status !== 200) {
+          return this.$message.error(err.data.msg)
+        }
+      }
     },
 
     // 更改分页
-    handleTableChange(pagination, filters, sorter) {
-      var pager = { ...this.pagination }
+    handleTableChange (pagination, filters, sorter) {
+      const pager = { ...this.pagination }
       pager.current = pagination.current
       pager.pageSize = pagination.pageSize
       this.queryParam.pagesize = pagination.pageSize
@@ -391,7 +436,7 @@ export default {
       this.getUserList()
     },
     // 删除用户
-    deleteUser(id) {
+    deleteUser (id) {
       this.$confirm({
         title: '提示：请再次确认',
         content: '确定要删除该用户吗？一旦删除，无法恢复',
@@ -403,17 +448,17 @@ export default {
         },
         onCancel: () => {
           this.$message.info('已取消删除')
-        },
+        }
       })
     },
     // 新增用户
-    addUserOk() {
+    addUserOk () {
       this.$refs.addUserRef.validate(async (valid) => {
         if (!valid) return this.$message.error('参数不符合要求，请重新输入')
         const { data: res } = await this.$http.post('user/add', {
           username: this.newUser.username,
           password: this.newUser.password,
-          role: this.newUser.role,
+          role: this.newUser.role
         })
         if (res.status != 200) return this.$message.error(res.message)
         this.$refs.addUserRef.resetFields()
@@ -422,12 +467,12 @@ export default {
         this.getUserList()
       })
     },
-    addUserCancel() {
+    addUserCancel () {
       this.$refs.addUserRef.resetFields()
       this.addUserVisible = false
       this.$message.info('新增用户已取消')
     },
-    adminChange(checked) {
+    adminChange (checked) {
       if (checked) {
         this.userInfo.role = 1
       } else {
@@ -435,18 +480,18 @@ export default {
       }
     },
     // 编辑用户
-    async editUser(id) {
+    async editUser (id) {
       this.editUserVisible = true
       const { data: res } = await this.$http.get(`user/${id}`)
       this.userInfo = res.data
       this.userInfo.id = id
     },
-    editUserOk() {
+    editUserOk () {
       this.$refs.addUserRef.validate(async (valid) => {
         if (!valid) return this.$message.error('参数不符合要求，请重新输入')
         const { data: res } = await this.$http.put(`user/${this.userInfo.id}`, {
           username: this.userInfo.username,
-          role: this.userInfo.role,
+          role: this.userInfo.role
         })
         if (res.status != 200) return this.$message.error(res.message)
         this.editUserVisible = false
@@ -454,36 +499,39 @@ export default {
         this.getUserList()
       })
     },
-    editUserCancel() {
+    editUserCancel () {
       this.$refs.addUserRef.resetFields()
       this.editUserVisible = false
       this.$message.info('编辑已取消')
     },
 
     // 修改密码
-    async ChangePassword(id) {
+    async ChangePassword (id) {
       this.changePasswordVisible = true
       const { data: res } = await this.$http.get(`user/${id}`)
       this.changePassword.id = id
     },
-    changePasswordOk() {
+    changePasswordOk () {
       this.$refs.changePasswordRef.validate(async (valid) => {
         if (!valid) return this.$message.error('参数不符合要求，请重新输入')
-        const { data: res } = await this.$http.put(`admin/changepw/${this.changePassword.id}`, {
-          password: this.changePassword.password,
-        })
+        const { data: res } = await this.$http.put(
+          `admin/changepw/${this.changePassword.id}`,
+          {
+            password: this.changePassword.password
+          }
+        )
         if (res.status != 200) return this.$message.error(res.message)
         this.changePasswordVisible = false
         this.$message.success('修改密码成功')
         this.getUserList()
       })
     },
-    changePasswordCancel() {
+    changePasswordCancel () {
       this.$refs.changePasswordRef.resetFields()
       this.changePasswordVisible = false
       this.$message.info('已取消')
-    },
-  },
+    }
+  }
 }
 </script>
 
