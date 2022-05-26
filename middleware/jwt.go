@@ -21,17 +21,12 @@ func JwtToken() gin.HandlerFunc {
 			return
 		}
 		checkToken := strings.Split(tokenHeader, " ")
-		if len(checkToken) == 0 {
+		if len(checkToken) == 0 || len(checkToken) != 2 || checkToken[0] != "Bearer" {
 			response.Fail(c, myerrors.ERRORCODE, utiljwt.TokenNotValidYet.Error())
 			c.Abort()
 			return
 		}
 
-		if len(checkToken) != 2 || checkToken[0] != "Bearer" {
-			response.Fail(c, myerrors.ERRORCODE, utiljwt.TokenNotValidYet.Error())
-			c.Abort()
-			return
-		}
 		//判断token是否在黑名单中
 		if service.IsInBlacklist(checkToken[1]) {
 			response.Fail(c, myerrors.ERRORCODE, utiljwt.TokenBlackList.Error())
